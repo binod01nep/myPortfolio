@@ -44,7 +44,7 @@ const Navbar = () => {
           </a>
 
           <a
-            href="/ResumeBinodBudha.pdf"
+            href="/BinodBudhaResume.pdf"
             download
             className="hover:text-green-400 transition"
           >
@@ -83,7 +83,7 @@ const Navbar = () => {
             </a>
 
             <a
-              href="/ResumeBinodBudha.pdf"
+              href="/BinodBudhaResume.pdf"
               download
               className="hover:text-green-400 transition"
             >
