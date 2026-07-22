@@ -46,52 +46,10 @@ const Sidebar = ({ activeSection, setActiveSection, theme, toggleTheme }) => {
       <div className={`lg:hidden fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b px-4 py-3 flex items-center justify-between transition-colors ${
         isLight ? 'bg-white/95 border-slate-200 text-slate-900 shadow-xs' : 'bg-[#0b0f17]/95 border-white/10 text-white'
       }`}>
-        {/* Mobile Social Links */}
-        <div className="flex items-center gap-1 sm:gap-2">
-          <a
-            href="https://github.com/binod01nep"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`p-1.5 rounded-lg transition ${
-              isLight ? 'text-slate-700 hover:text-slate-950 hover:bg-slate-100' : 'text-slate-400 hover:text-white hover:bg-white/10'
-            }`}
-            title="GitHub Profile"
-          >
-            <i className="ri-github-fill text-lg"></i>
-          </a>
-          <a
-            href="https://www.linkedin.com/in/binod-budha-7691773a1/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`p-1.5 rounded-lg transition ${
-              isLight ? 'text-slate-700 hover:text-cyan-600 hover:bg-cyan-50' : 'text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10'
-            }`}
-            title="LinkedIn Profile"
-          >
-            <i className="ri-linkedin-box-fill text-lg"></i>
-          </a>
-          <a
-            href="https://leetcode.com/u/ambilax/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`p-1.5 rounded-lg transition ${
-              isLight ? 'text-slate-700 hover:text-amber-600 hover:bg-amber-50' : 'text-slate-400 hover:text-amber-400 hover:bg-amber-500/10'
-            }`}
-            title="LeetCode Profile (AmBiLax)"
-          >
-            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-              <path d="M16.102 17.93l-2.697 2.607c-.466.467-1.111.662-1.823.662s-1.357-.195-1.824-.662l-4.332-4.363c-.467-.467-.702-1.15-.702-1.863 0-.713.235-1.357.702-1.824l4.319-4.38c.467-.467 1.125-.645 1.837-.645s1.357.195 1.823.662l2.697 2.606c.514.515 1.365.497 1.9-.038.535-.536.553-1.387.039-1.901l-2.609-2.636c-1.005-1.006-2.412-1.507-3.85-1.507s-2.845.501-3.85 1.507l-4.321 4.382c-1.006 1.005-1.536 2.378-1.536 3.82 0 1.443.53 2.816 1.536 3.821l4.333 4.364c1.005 1.006 2.412 1.507 3.85 1.507s2.845-.501 3.85-1.507l2.609-2.636c.514-.514.496-1.365-.039-1.901-.535-.535-1.386-.553-1.9-.038zM20.811 13.01H10.666c-.702 0-1.27.568-1.27 1.27 0 .702.568 1.27 1.27 1.27h10.145c.702 0 1.27-.568 1.27-1.27 0-.702-.568-1.27-1.27-1.27z"/>
-            </svg>
-          </a>
-          <a
-            href="mailto:bcb4314@gmail.com"
-            className={`p-1.5 rounded-lg transition ${
-              isLight ? 'text-slate-700 hover:text-emerald-600 hover:bg-emerald-50' : 'text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10'
-            }`}
-            title="Send Email"
-          >
-            <Mail className="w-4 h-4" />
-          </a>
+        {/* Mobile Title */}
+        <div className="flex items-center gap-2 font-mono text-sm text-emerald-500 font-bold">
+          <Folder className="w-4 h-4 text-amber-500 fill-amber-500/20" />
+          <span>Profile</span>
         </div>
 
         {/* Action Controls (Theme Toggle + Menu Toggle) */}
@@ -130,15 +88,15 @@ const Sidebar = ({ activeSection, setActiveSection, theme, toggleTheme }) => {
       <aside className={`
         fixed top-0 bottom-0 left-0 z-40
         w-80 sm:w-88 xl:w-96
-        p-4 lg:p-5
-        flex flex-col gap-4
+        p-3.5 sm:p-4 lg:p-5
+        flex flex-col gap-3 sm:gap-4
         backdrop-blur-xl border-r
         transition-all duration-300 ease-in-out
         overflow-y-auto custom-scrollbar
         ${isLight 
           ? 'bg-white/95 lg:bg-white/90 border-slate-200 text-slate-800' 
           : 'bg-[#0b0f17]/95 lg:bg-[#0b0f17]/85 border-white/10 text-slate-100'}
-        ${mobileOpen ? 'translate-x-0 pt-20' : '-translate-x-full lg:translate-x-0'}
+        ${mobileOpen ? 'translate-x-0 pt-16 lg:pt-5' : '-translate-x-full lg:translate-x-0'}
       `}>
         
         {/* LINKEDIN-STYLE PROFILE BANNER CARD */}
@@ -147,7 +105,7 @@ const Sidebar = ({ activeSection, setActiveSection, theme, toggleTheme }) => {
         }`}>
           
           {/* Top Banner Cover Image Space with bg.png */}
-          <div className={`relative h-24 sm:h-28 w-full overflow-hidden border-b ${
+          <div className={`relative h-20 sm:h-26 w-full overflow-hidden border-b ${
             isLight ? 'bg-slate-200 border-slate-200' : 'bg-slate-950 border-white/10'
           }`}>
             <img
@@ -165,12 +123,12 @@ const Sidebar = ({ activeSection, setActiveSection, theme, toggleTheme }) => {
           </div>
 
           {/* Profile Card Body */}
-          <div className="p-4 pt-0">
+          <div className="p-3 sm:p-4 pt-0">
             
             {/* Centered Photo & Online Status (Overlapping Banner) */}
             <div className="flex flex-col items-center text-center">
-              <div className="relative -mt-12 sm:-mt-14 mb-3 group">
-                <div className={`relative w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden p-0.5 ${
+              <div className="relative -mt-10 sm:-mt-13 mb-2 group">
+                <div className={`relative w-20 h-20 sm:w-26 sm:h-26 rounded-full overflow-hidden p-0.5 ${
                   isLight ? 'bg-white' : 'bg-slate-950'
                 }`}>
                   <img
