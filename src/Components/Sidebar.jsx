@@ -360,8 +360,8 @@ const Sidebar = ({ activeSection, setActiveSection, theme, toggleTheme }) => {
           </nav>
         </div>
 
-        {/* FOOTER BADGE IN SIDEBAR */}
-        <div className={`mt-auto pt-3 border-t text-center shrink-0 pb-2 ${
+        {/* FOOTER BADGE IN SIDEBAR (Positioned directly below Let's Connect button) */}
+        <div className={`mt-2.5 pt-2 border-t text-center shrink-0 ${
           isLight ? 'border-slate-200' : 'border-white/10'
         }`}>
           <p className={`text-[10px] font-mono ${
