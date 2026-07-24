@@ -40,6 +40,18 @@ const ChatAssistant = ({ theme }) => {
 
   const isLight = theme === 'light';
 
+  // ─── Lock body scroll when chat is open ─────────────────────
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   // ─── Auto-scroll ──────────────────────────────────────────────────────
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -130,6 +142,15 @@ const ChatAssistant = ({ theme }) => {
 
   return (
     <>
+      {/* ── Backdrop Blur Overlay ─────────────────────────────── */}
+      {isOpen && (
+        <div
+          className="chat-backdrop"
+          onClick={toggleChat}
+          aria-hidden="true"
+        />
+      )}
+
       {/* ── Chat Window ───────────────────────────────────────────────── */}
       <div
         ref={chatWindowRef}
