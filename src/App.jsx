@@ -6,6 +6,7 @@ import Project from './Components/Project';
 import Certificates from './Components/Certificates';
 import Connect from './Components/Connect';
 import Footer from './Components/Footer';
+import ChatAssistant from './Components/ChatAssistant/ChatAssistant';
 
 const App = () => {
   const [activeSection, setActiveSection] = useState('about');
@@ -108,6 +109,9 @@ const App = () => {
 
         </main>
       </div>
+
+      {/* Floating AI Portfolio Chat Assistant */}
+      <ChatAssistant theme={theme} />
 
     </div>
   );
