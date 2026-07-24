@@ -7,27 +7,53 @@ import React from 'react';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-/** Render markdown-lite: **bold** and newlines */
+/** Render markdown-lite: **bold**, URLs as links, and newlines */
 const RenderText = ({ content }) => {
   const parts = content.split('\n');
+
+  // Parse a single line: handles **bold** and auto-linked URLs
+  const parseLine = (line) => {
+    // Split by URLs first
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const urlParts = line.split(urlRegex);
+
+    return urlParts.map((part, idx) => {
+      if (urlRegex.test(part)) {
+        // Reset regex lastIndex
+        urlRegex.lastIndex = 0;
+        return (
+          <a
+            key={idx}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="chat-link"
+          >
+            {part}
+          </a>
+        );
+      }
+      // Parse **bold** within non-URL segments
+      urlRegex.lastIndex = 0;
+      const boldParts = part.split(/(\*\*[^*]+\*\*)/g);
+      return boldParts.map((seg, j) =>
+        seg.startsWith('**') && seg.endsWith('**') ? (
+          <strong key={`${idx}-${j}`}>{seg.slice(2, -2)}</strong>
+        ) : (
+          <span key={`${idx}-${j}`}>{seg}</span>
+        )
+      );
+    });
+  };
+
   return (
     <div className="chat-text-content">
-      {parts.map((line, i) => {
-        // Parse **bold**
-        const segments = line.split(/(\*\*[^*]+\*\*)/g);
-        return (
-          <React.Fragment key={i}>
-            {segments.map((seg, j) =>
-              seg.startsWith('**') && seg.endsWith('**') ? (
-                <strong key={j}>{seg.slice(2, -2)}</strong>
-              ) : (
-                <span key={j}>{seg}</span>
-              )
-            )}
-            {i < parts.length - 1 && <br />}
-          </React.Fragment>
-        );
-      })}
+      {parts.map((line, i) => (
+        <React.Fragment key={i}>
+          {parseLine(line)}
+          {i < parts.length - 1 && <br />}
+        </React.Fragment>
+      ))}
     </div>
   );
 };

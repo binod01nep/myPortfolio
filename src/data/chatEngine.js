@@ -8,7 +8,39 @@
 import { portfolioData as d } from "./portfolioData";
 
 // ─── Intent Maps ────────────────────────────────────────────────────────────
+// NOTE: Order matters — more specific intents MUST come before general ones.
 const intentMap = [
+  // ── Specific social/platform intents first (prevent skills swallowing them) ──
+  {
+    intent: "github",
+    keywords: ["github", "repository", "repo", "gh profile", "source code", "open source"],
+  },
+  {
+    intent: "linkedin",
+    keywords: ["linkedin", "professional network"],
+  },
+  {
+    intent: "email",
+    keywords: ["email", "mail", "gmail", "send email", "send message"],
+  },
+  {
+    intent: "phone",
+    keywords: ["phone", "number", "call", "mobile", "telephone", "whatsapp"],
+  },
+  {
+    intent: "resume",
+    keywords: ["resume", "cv", "download", "pdf", "curriculum vitae", "resumé"],
+  },
+  {
+    intent: "social",
+    keywords: ["social", "links", "profiles", "where to find", "find binod", "portfolio site", "website"],
+  },
+  {
+    intent: "openSource",
+    keywords: ["open source", "contribution", "contribute", "github projects"],
+  },
+
+  // ── General intents ──
   {
     intent: "greeting",
     keywords: ["hello", "hi", "hey", "greet", "good morning", "good afternoon", "good evening", "sup", "howdy"],
@@ -20,10 +52,10 @@ const intentMap = [
   {
     intent: "skills",
     keywords: [
-      "skill", "stack", "tech", "technology", "technologies", "language", "coding",
+      "skill", "stack", "tech", "technology", "technologies", "coding",
       "java", "python", "javascript", "react", "node", "express", "spring",
       "mongodb", "mysql", "tailwind", "html", "css", "kotlin", "fastapi",
-      "aws", "firebase", "git", "vs code", "postman", "linux", "backend",
+      "aws", "firebase", "vs code", "postman", "linux", "backend",
       "frontend", "database", "cloud", "tools", "framework", "library",
       "what does he know", "proficient", "expertise",
     ],
@@ -52,36 +84,12 @@ const intentMap = [
     ],
   },
   {
-    intent: "resume",
-    keywords: ["resume", "cv", "download", "pdf", "curriculum vitae", "resumé"],
-  },
-  {
     intent: "contact",
     keywords: [
       "contact", "hire", "hiring", "work together", "collaborate", "collaboration",
-      "freelance", "internship", "opportunity", "reach", "get in touch",
+      "freelance", "opportunity", "reach", "get in touch",
       "recruit", "recruiter", "offer", "available", "availability",
     ],
-  },
-  {
-    intent: "github",
-    keywords: ["github", "repository", "repo", "open source", "code", "source code"],
-  },
-  {
-    intent: "linkedin",
-    keywords: ["linkedin", "connect", "professional network", "profile"],
-  },
-  {
-    intent: "social",
-    keywords: ["social", "links", "profiles", "where to find", "find binod", "portfolio site", "website"],
-  },
-  {
-    intent: "email",
-    keywords: ["email", "mail", "gmail", "send email", "send message"],
-  },
-  {
-    intent: "phone",
-    keywords: ["phone", "number", "call", "mobile", "telephone", "whatsapp"],
   },
   {
     intent: "location",
@@ -95,20 +103,22 @@ const intentMap = [
       "hackathon", "competition", "rank",
     ],
   },
-  {
-    intent: "openSource",
-    keywords: ["open source", "contribution", "contribute", "github projects"],
-  },
 ];
 
 // ─── Detect Intent ───────────────────────────────────────────────────────────
+// Uses word-boundary matching for short keywords to avoid false positives
+// e.g. "git" should NOT match "github"
 export function detectIntent(input) {
   const lower = input.toLowerCase().trim();
 
   for (const entry of intentMap) {
     for (const kw of entry.keywords) {
-      if (lower.includes(kw)) {
-        return entry.intent;
+      // For short keywords (≤4 chars), use word-boundary to avoid substring collisions
+      if (kw.length <= 4) {
+        const regex = new RegExp(`(?<![a-z])${kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![a-z])`, 'i');
+        if (regex.test(lower)) return entry.intent;
+      } else {
+        if (lower.includes(kw)) return entry.intent;
       }
     }
   }
@@ -198,7 +208,7 @@ export function generateResponse(input) {
     case "github":
       return {
         type: "social",
-        content: `Here's Binod's GitHub profile 🐙`,
+        content: `🐙 **Binod's GitHub Profile**\n\n👉 https://github.com/binod01nep\n\nYou can explore all his repositories, projects, and open-source work here:`,
         links: d.social.filter((s) => s.platform === "GitHub"),
       };
 
@@ -253,7 +263,7 @@ export function generateResponse(input) {
     case "openSource":
       return {
         type: "social",
-        content: `🌍 Binod actively contributes to open source on GitHub. You can explore all his repositories here:`,
+        content: `🌍 **Binod's Open Source Contributions**\n\n👉 https://github.com/binod01nep\n\nBinod actively contributes to open source on GitHub. Explore all his repositories here:`,
         links: d.social.filter((s) => s.platform === "GitHub"),
       };
 

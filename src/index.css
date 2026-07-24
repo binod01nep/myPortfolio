@@ -1,34 +1,5 @@
 @import "tailwindcss";
 
-/* ─── Custom Font Declarations ─────────────────────────────────────────── */
-
-/* Naru Sans – Humanist sans-serif, primary body & UI font */
-@font-face {
-  font-family: 'Naru Sans';
-  src: url('/fonts/Naru Sans Demo.ttf') format('truetype');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Lenia Mono – Elegant monospace, code labels & badges */
-@font-face {
-  font-family: 'Lenia Mono';
-  src: url('/fonts/Lenia Mono DEMO.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Block Blueprint – Bold geometric, display headings only */
-@font-face {
-  font-family: 'Block Blueprint';
-  src: url('/fonts/BlockBlueprint.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -40,7 +11,7 @@
     padding: 0;
     background-color: #080a0f;
     color: #f3f4f6;
-    font-family: 'Naru Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     overflow-x: hidden;
     letter-spacing: -0.008em;
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -53,7 +24,7 @@
   }
 
   code, kbd, samp, pre, .font-mono {
-    font-family: 'Lenia Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
   }
 }
 
@@ -507,6 +478,30 @@ h1, h2, h3 {
 
 .chat-window--light .chat-text-content strong {
   color: #059669;
+}
+
+/* Auto-linked URLs inside chat responses */
+.chat-link {
+  color: #34d399;
+  text-decoration: underline;
+  text-decoration-color: rgba(52, 211, 153, 0.4);
+  text-underline-offset: 2px;
+  word-break: break-all;
+  transition: color 0.15s;
+}
+
+.chat-link:hover {
+  color: #6ee7b7;
+  text-decoration-color: rgba(110, 231, 183, 0.7);
+}
+
+.chat-window--light .chat-link {
+  color: #059669;
+  text-decoration-color: rgba(5, 150, 105, 0.4);
+}
+
+.chat-window--light .chat-link:hover {
+  color: #047857;
 }
 
 /* ── Typing Indicator ────────────────────────────────────────── */
