@@ -1,12 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { portfolioData } from "../data/portfolioData";
-import SectionHeader from "../Components/SectionHeader";
-import ProjectList from "../Components/ProjectList";
 
 export default function Home() {
-  const { personal, contact, projects } = portfolioData;
-  const featuredProjects = projects.filter((p) => p.featured).slice(0, 3);
+  const { personal, contact } = portfolioData;
 
   return (
     <div className="max-w-5xl mx-auto px-6 pt-6 md:pt-10 pb-16 animate-fade-in flex flex-col gap-14">
@@ -69,28 +66,6 @@ export default function Home() {
           >
             Download Resume ↗
           </a>
-        </div>
-      </section>
-
-      {/* ─── Selected Work Section ────────────────────────────────────────── */}
-      <section className="pt-2">
-        <SectionHeader
-          number="01"
-          title="Selected Work"
-          description="Featured engineering systems and AI integrations."
-        />
-
-        <ProjectList projects={featuredProjects} />
-
-        <div className="mt-6 pt-4 flex items-center justify-between font-mono text-xs">
-          <span className="text-[#71717a]">Detailed case studies with architecture breakdown.</span>
-          <Link
-            to="/work"
-            className="text-[#ededed] hover:text-white inline-flex items-center gap-1 group"
-          >
-            <span>View all work</span>
-            <span className="group-hover:translate-x-1 transition-transform">→</span>
-          </Link>
         </div>
       </section>
 
