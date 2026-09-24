@@ -1,119 +1,58 @@
 /**
  * chatEngine.js
- * Keyword-matching engine that maps user input to intent categories
- * and generates human-like responses from portfolioData.
- * No external API — 100% offline.
+ * Offline keyword-matching assistant engine using verified authentic data.
  */
 
 import { portfolioData as d } from "./portfolioData";
 
-// ─── Intent Maps ────────────────────────────────────────────────────────────
-// NOTE: Order matters — more specific intents MUST come before general ones.
 const intentMap = [
-  // ── Specific social/platform intents first (prevent skills swallowing them) ──
-  {
-    intent: "github",
-    keywords: ["github", "repository", "repo", "gh profile", "source code", "open source"],
-  },
-  {
-    intent: "linkedin",
-    keywords: ["linkedin", "professional network"],
-  },
-  {
-    intent: "email",
-    keywords: ["email", "mail", "gmail", "send email", "send message"],
-  },
-  {
-    intent: "phone",
-    keywords: ["phone", "number", "call", "mobile", "telephone", "whatsapp"],
-  },
   {
     intent: "resume",
-    keywords: ["resume", "cv", "download", "pdf", "curriculum vitae", "resumé"],
-  },
-  {
-    intent: "social",
-    keywords: ["social", "links", "profiles", "where to find", "find binod", "portfolio site", "website"],
-  },
-  {
-    intent: "openSource",
-    keywords: ["open source", "contribution", "contribute", "github projects"],
-  },
-
-  // ── General intents ──
-  {
-    intent: "greeting",
-    keywords: ["hello", "hi", "hey", "greet", "good morning", "good afternoon", "good evening", "sup", "howdy"],
-  },
-  {
-    intent: "about",
-    keywords: ["about", "who", "binod", "tell me", "introduce", "background", "person", "yourself"],
-  },
-  {
-    intent: "skills",
-    keywords: [
-      "skill", "stack", "tech", "technology", "technologies", "coding",
-      "java", "python", "javascript", "react", "node", "express", "spring",
-      "mongodb", "mysql", "tailwind", "html", "css", "kotlin", "fastapi",
-      "aws", "firebase", "vs code", "postman", "linux", "backend",
-      "frontend", "database", "cloud", "tools", "framework", "library",
-      "what does he know", "proficient", "expertise",
-    ],
-  },
-  {
-    intent: "projects",
-    keywords: [
-      "project", "built", "build", "made", "created", "portfolio", "work",
-      "application", "app", "system", "platform", "software", "demo",
-      "scam", "resume builder", "banking", "review", "routing",
-    ],
-  },
-  {
-    intent: "education",
-    keywords: [
-      "education", "study", "studying", "university", "college", "degree",
-      "gpa", "grade", "pdeu", "pandit", "academic", "school", "qualification",
-      "undergraduate", "btech", "b.tech", "computer science", "cse",
-    ],
-  },
-  {
-    intent: "experience",
-    keywords: [
-      "experience", "work experience", "worked", "internship", "job",
-      "professional", "career", "employment", "position", "role",
-    ],
+    keywords: ["resume", "cv", "download resume", "pdf", "curriculum vitae", "resumé", "download"],
   },
   {
     intent: "contact",
-    keywords: [
-      "contact", "hire", "hiring", "work together", "collaborate", "collaboration",
-      "freelance", "opportunity", "reach", "get in touch",
-      "recruit", "recruiter", "offer", "available", "availability",
-    ],
+    keywords: ["contact", "email", "phone", "reach", "hire", "collaborate", "hiring", "touch", "call"],
   },
   {
-    intent: "location",
-    keywords: ["location", "where", "city", "country", "based", "live", "india", "gujarat", "gandhinagar", "nepal"],
+    intent: "github",
+    keywords: ["github", "repo", "repository", "source code", "open source"],
   },
   {
-    intent: "achievements",
-    keywords: [
-      "achievement", "award", "scholarship", "compex", "honor", "honour",
-      "recognition", "certificate", "kaggle", "google deepmind", "genai",
-      "hackathon", "competition", "rank",
-    ],
+    intent: "linkedin",
+    keywords: ["linkedin", "profile", "connect"],
+  },
+  {
+    intent: "projects",
+    keywords: ["project", "work", "built", "build", "scam", "review", "routing", "ledger", "case study", "portfolio"],
+  },
+  {
+    intent: "skills",
+    keywords: ["skill", "stack", "tech", "languages", "frontend", "backend", "database", "java", "python", "javascript", "react", "node"],
+  },
+  {
+    intent: "experience",
+    keywords: ["experience", "internship", "inamigos", "bluestock", "job", "work experience", "career"],
+  },
+  {
+    intent: "education",
+    keywords: ["education", "study", "university", "college", "pdeu", "gpa", "degree", "school", "pandit"],
+  },
+  {
+    intent: "about",
+    keywords: ["who are you", "about", "bio", "introduce", "binod", "background", "philosophy", "what do you build"],
+  },
+  {
+    intent: "greeting",
+    keywords: ["hello", "hi", "hey", "greetings", "good morning", "good evening", "sup"],
   },
 ];
 
-// ─── Detect Intent ───────────────────────────────────────────────────────────
-// Uses word-boundary matching for short keywords to avoid false positives
-// e.g. "git" should NOT match "github"
 export function detectIntent(input) {
   const lower = input.toLowerCase().trim();
 
   for (const entry of intentMap) {
     for (const kw of entry.keywords) {
-      // For short keywords (≤4 chars), use word-boundary to avoid substring collisions
       if (kw.length <= 4) {
         const regex = new RegExp(`(?<![a-z])${kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![a-z])`, 'i');
         if (regex.test(lower)) return entry.intent;
@@ -125,174 +64,79 @@ export function detectIntent(input) {
   return "unknown";
 }
 
-// ─── Generate Response ───────────────────────────────────────────────────────
 export function generateResponse(input) {
   const intent = detectIntent(input);
 
   switch (intent) {
     case "greeting":
       return {
-        type: "text",
-        content: `Hey there! 👋 I'm Binod's AI Portfolio Assistant. I can answer questions about his skills, projects, education, experience, and contact info.\n\nWhat would you like to know?`,
+        text: `Hello. I am Binod Budha's portfolio assistant. You can ask me about his work, technical skills, academic background, internships, or how to contact him.`,
       };
 
     case "about":
       return {
-        type: "text",
-        content: `👨‍💻 **About Binod Budha**\n\n${d.bio}\n\n🎯 **Role:** ${d.role}\n📍 **Location:** ${d.location.current}\n✅ **Status:** ${d.availability}`,
+        text: `${d.personal.name} is a ${d.personal.title} and CS undergraduate at ${d.personal.status.institution} (CGPA: ${d.personal.status.gpa}).\n\n${d.personal.tagline}\n\nKey focus areas: Scalable MERN web systems, REST APIs, and practical AI integrations with Groq & NLP.`,
       };
 
     case "skills":
       return {
-        type: "skills",
-        content: `Here's a full breakdown of Binod's technical skills:`,
-        skills: d.skills,
+        text: `Technical Stack Overview:\n\n• Languages: ${d.skills.languages.join(", ")}\n• Frontend: ${d.skills.frontend.join(", ")}\n• Backend: ${d.skills.backend.join(", ")}\n• Databases: ${d.skills.databases.join(", ")}\n• Core CS: ${d.skills.core.slice(0, 4).join(", ")}\n• Tools: ${d.skills.tools.slice(0, 5).join(", ")}`,
       };
 
     case "projects":
       return {
-        type: "projects",
-        content: `Here are Binod's featured projects 🚀`,
-        projects: d.projects,
-      };
-
-    case "education":
-      return {
-        type: "text",
-        content:
-          `🎓 **Education**\n\n` +
-          d.education
-            .map(
-              (edu) =>
-                `**${edu.degree}**\n` +
-                `🏛️ ${edu.institution}\n` +
-                `📍 ${edu.location}\n` +
-                `📅 ${edu.period} · GPA: ${edu.gpa}\n` +
-                `⭐ ${edu.highlight}`
-            )
-            .join("\n\n"),
+        text: `Featured Technical Projects:\n\n1. AI Scam Detection Platform (AI · Groq · Full Stack)\n2. Smart Review Routing System (NLP · Express · n8n)\n3. Smart Resume Builder (MERN · PDF Engine)\n4. Banking Ledger System (Node · MongoDB · Ledger)\n\nYou can explore dedicated technical case studies on the /work page.`,
+        action: { label: "View All Work", link: "/work" }
       };
 
     case "experience":
       return {
-        type: "text",
-        content:
-          `💼 **Experience**\n\n` +
-          d.experience
-            .map(
-              (exp) =>
-                `**${exp.role}**\n` +
-                `🏷️ ${exp.type} · ${exp.period}\n` +
-                `${exp.description}`
-            )
-            .join("\n\n") +
-          `\n\n📌 Binod is currently seeking full-time roles and engineering internships.`,
+        text: `Internship Experience:\n\n• Web Developer Intern — InAmigos Foundation (03/2026 — 05/2026)\n  React.js, Tailwind CSS, REST APIs, Git, Agile.\n\n• Data Analyst Intern — BlueStock FinTech (05/2026 — 07/2026)\n  Financial dataset analysis, preprocessing, validation, dashboards.`,
+        action: { label: "View Experience", link: "/experience" }
+      };
+
+    case "education":
+      return {
+        text: `Education:\n\n• B.Tech in Computer Science & Engineering\n  Pandit Deendayal Energy University (PDEU), Gandhinagar (2023 — 2027)\n  CGPA: 9.22 / 10.0 (Batch Top Rank)\n\n• Higher Secondary (Science)\n  Padmodaya Secondary School, Dang, Nepal (2021 — 2023)\n  GPA: 3.63 / 4.00 (Distinction)`,
       };
 
     case "resume":
       return {
-        type: "resume",
-        content: `You can download Binod's latest resume here 👇`,
-        resume: d.resume,
+        text: `Binod's verified resume is available for direct download.`,
+        action: { label: "Download Resume (PDF)", url: d.contact.resumeUrl, external: true }
       };
 
     case "contact":
       return {
-        type: "contact",
-        content: `Let's connect! 🤝\n\nBinod is open to full-time roles, internships, freelance projects, and collaborations. Reach him through any of these channels:`,
-        contact: d.contact,
-        social: d.social,
-        resume: d.resume,
+        text: `Contact Information:\n\n• Email: ${d.contact.email}\n• Phone: ${d.contact.phone}\n• Location: ${d.contact.location}\n• GitHub: ${d.contact.github}\n• LinkedIn: ${d.contact.linkedin}`,
+        action: { label: "Go to Contact Page", link: "/contact" }
       };
 
     case "github":
       return {
-        type: "social",
-        content: `🐙 **Binod's GitHub Profile**\n\n👉 https://github.com/binod01nep\n\nYou can explore all his repositories, projects, and open-source work here:`,
-        links: d.social.filter((s) => s.platform === "GitHub"),
+        text: `GitHub Profile: ${d.contact.github}\nContains source repositories for AI security systems, review routing pipelines, and full-stack applications.`,
+        action: { label: "Open GitHub Profile", url: d.contact.github, external: true }
       };
 
     case "linkedin":
       return {
-        type: "social",
-        content: `Here's Binod's LinkedIn profile 💼`,
-        links: d.social.filter((s) => s.platform === "LinkedIn"),
-      };
-
-    case "social":
-      return {
-        type: "social",
-        content: `Here are all of Binod's social profiles and links 🔗`,
-        links: d.social,
-      };
-
-    case "email":
-      return {
-        type: "text",
-        content: `📧 **Email Binod directly:**\n\n${d.contact.email}\n\nYou can click below to open your email client:`,
-        action: { label: "Send Email ↗", url: `mailto:${d.contact.email}` },
-      };
-
-    case "phone":
-      return {
-        type: "text",
-        content: `📞 **Phone / WhatsApp:**\n\n${d.contact.phone}\n\nLocated in Gandhinagar, Gujarat, India (IST timezone).`,
-      };
-
-    case "location":
-      return {
-        type: "text",
-        content: `📍 **Location:**\n\nBinod is currently based in **${d.location.current}**, originally from **${d.location.origin}**.\n\n🕐 Timezone: ${d.location.timezone}`,
-      };
-
-    case "achievements":
-      return {
-        type: "text",
-        content:
-          `🏆 **Achievements & Honors**\n\n` +
-          d.achievements
-            .map(
-              (a) =>
-                `⭐ **${a.title}** (${a.year})\n` +
-                `🏛️ ${a.organization}\n` +
-                `${a.description}`
-            )
-            .join("\n\n"),
-      };
-
-    case "openSource":
-      return {
-        type: "social",
-        content: `🌍 **Binod's Open Source Contributions**\n\n👉 https://github.com/binod01nep\n\nBinod actively contributes to open source on GitHub. Explore all his repositories here:`,
-        links: d.social.filter((s) => s.platform === "GitHub"),
+        text: `LinkedIn Profile: ${d.contact.linkedin}`,
+        action: { label: "Open LinkedIn Profile", url: d.contact.linkedin, external: true }
       };
 
     default:
       return {
-        type: "unknown",
-        content: `Sorry, I don't have that information yet. 🤔\n\nTry asking about:\n• **Projects** – What has Binod built?\n• **Skills** – What technologies does he know?\n• **Education** – Where is he studying?\n• **Resume** – Download his CV\n• **Contact** – How to hire Binod\n• **GitHub** – View his code`,
+        text: `I can assist with queries about:\n• About Binod\n• Skills and tech stack\n• Featured projects & case studies\n• Work experience & internships\n• Education & achievements\n• Contact channels & Resume`,
       };
   }
 }
 
-// ─── Suggestion Chips ─────────────────────────────────────────────────────
-export const suggestions = [
-  { label: "Tell me about Binod", query: "tell me about binod" },
-  { label: "⚙️ Skills", query: "skills" },
-  { label: "🚀 Projects", query: "projects" },
-  { label: "🎓 Education", query: "education" },
-  { label: "💼 Experience", query: "experience" },
-  { label: "🛠️ Tech Stack", query: "tech stack" },
-  { label: "📄 Resume", query: "resume" },
-  { label: "📩 Contact", query: "contact" },
-  { label: "🐙 GitHub", query: "github" },
-  { label: "💼 LinkedIn", query: "linkedin" },
-  { label: "🏆 Achievements", query: "achievements" },
-  { label: "⬇️ Download Resume", query: "download resume" },
-  { label: "🤝 Hire Binod", query: "hire" },
-  { label: "📧 Email", query: "email" },
-  { label: "📞 Phone", query: "phone" },
-  { label: "📍 Location", query: "location" },
-  { label: "🌍 Open Source", query: "open source" },
-  { label: "🔗 Social Links", query: "social links" },
+export const presetQuestions = [
+  "Who are you?",
+  "What do you build?",
+  "What are your skills?",
+  "Tell me about your projects.",
+  "Show me your experience.",
+  "How can I contact you?",
+  "Download resume"
 ];

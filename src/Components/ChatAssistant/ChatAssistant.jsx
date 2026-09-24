@@ -1,270 +1,169 @@
-/**
- * ChatAssistant.jsx
- * Main floating AI Portfolio Chat Assistant component.
- * - Floating circular button (bottom-right)
- * - Opens into a glassmorphism dark chat window
- * - Keyboard: Enter=send, Shift+Enter=newline, ESC=close
- * - Auto-scrolls to newest message
- * - Fully responsive (mobile + desktop)
- */
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { generateResponse } from '../../data/chatEngine';
-import ChatMessage from './ChatMessage';
-import SuggestionChips from './SuggestionChips';
-import TypingIndicator from './TypingIndicator';
+import React, { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { generateResponse, presetQuestions } from "../../data/chatEngine";
+import { portfolioData } from "../../data/portfolioData";
 
-// ─── Welcome Message ──────────────────────────────────────────────────────
-const WELCOME = {
-  id: 'welcome',
-  role: 'bot',
-  timestamp: new Date(),
-  response: {
-    type: 'text',
-    content:
-      `Hello 👋\n\nI'm Binod's AI Portfolio Assistant.\n\nI can answer questions about:\n\n• Skills & Tech Stack\n• Projects Built\n• Education & GPA\n• Experience\n• Resume & CV\n• Contact & Social Links\n\nChoose a suggestion below or type your own question.`,
-  },
-};
-
-// ─── Component ────────────────────────────────────────────────────────────
-const ChatAssistant = ({ theme }) => {
+export default function ChatAssistant() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([WELCOME]);
-  const [inputValue, setInputValue] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [showChips, setShowChips] = useState(true);
-  const [hasNewMessage, setHasNewMessage] = useState(false);
-
+  const [messages, setMessages] = useState([
+    {
+      sender: "assistant",
+      text: `Hello. I am ${portfolioData.personal.shortName}'s portfolio assistant. Select a prompt or type below to explore his work, skills, or experience.`,
+    },
+  ]);
+  const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
-  const inputRef = useRef(null);
-  const chatWindowRef = useRef(null);
 
-  const isLight = theme === 'light';
-
-  // ─── Lock body scroll when chat is open ─────────────────────
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
-
-  // ─── Auto-scroll ──────────────────────────────────────────────────────
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
     if (isOpen) {
       scrollToBottom();
     }
-  }, [messages, isTyping, isOpen, scrollToBottom]);
-
-  // ─── Focus input when opened ──────────────────────────────────────────
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 150);
-    }
-  }, [isOpen]);
-
-  // ─── ESC to close ─────────────────────────────────────────────────────
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && isOpen) {
-        setIsOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
-
-  // ─── Notification pulse when closed ──────────────────────────────────
-  useEffect(() => {
-    if (!isOpen && messages.length > 1) {
-      setHasNewMessage(true);
-    } else {
-      setHasNewMessage(false);
-    }
   }, [messages, isOpen]);
 
-  // ─── Send Message ─────────────────────────────────────────────────────
-  const handleSend = useCallback(
-    (query) => {
-      const text = (query || inputValue).trim();
-      if (!text) return;
+  const handleSend = (textToSend) => {
+    const query = textToSend || input;
+    if (!query.trim()) return;
 
-      // Add user message
-      const userMsg = {
-        id: Date.now(),
-        role: 'user',
-        content: text,
-        timestamp: new Date(),
-        response: null,
-      };
+    const userMessage = { sender: "user", text: query };
+    const response = generateResponse(query);
+    const assistantMessage = {
+      sender: "assistant",
+      text: response.text,
+      action: response.action,
+    };
 
-      setMessages((prev) => [...prev, userMsg]);
-      setInputValue('');
-      setIsTyping(true);
-      setShowChips(false);
-
-      // Simulate slight AI delay for realism
-      const delay = 600 + Math.random() * 600;
-      setTimeout(() => {
-        const response = generateResponse(text);
-        const botMsg = {
-          id: Date.now() + 1,
-          role: 'bot',
-          timestamp: new Date(),
-          response,
-        };
-        setMessages((prev) => [...prev, botMsg]);
-        setIsTyping(false);
-      }, delay);
-    },
-    [inputValue]
-  );
-
-  // ─── Keyboard handler ─────────────────────────────────────────────────
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
+    setMessages((prev) => [...prev, userMessage, assistantMessage]);
+    setInput("");
   };
 
-  // ─── Toggle open/close ────────────────────────────────────────────────
-  const toggleChat = () => {
-    setIsOpen((prev) => !prev);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleSend();
   };
 
   return (
-    <>
-      {/* ── Backdrop Blur Overlay ─────────────────────────────── */}
-      {isOpen && (
-        <div
-          className="chat-backdrop"
-          onClick={toggleChat}
-          aria-hidden="true"
-        />
+    <div className="fixed bottom-6 right-6 z-50 font-sans">
+      {/* Floating Toggle Button */}
+      {!isOpen && (
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className="flex items-center gap-2 px-3.5 py-2 bg-[#121212] hover:bg-[#1c1c1c] text-[#ededed] text-xs font-mono border border-[#2a2a2a] hover:border-[#444444] shadow-lg transition-colors cursor-pointer"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-[#ededed]"></span>
+          <span>Assistant</span>
+          <span className="text-[#71717a] text-[10px]">/ ?</span>
+        </button>
       )}
 
-      {/* ── Chat Window ───────────────────────────────────────────────── */}
-      <div
-        ref={chatWindowRef}
-        className={`chat-window ${isOpen ? 'chat-window--open' : 'chat-window--closed'} ${isLight ? 'chat-window--light' : 'chat-window--dark'}`}
-        role="dialog"
-        aria-modal="true"
-        aria-label="AI Portfolio Assistant"
-      >
-        {/* Header */}
-        <div className="chat-header">
-          <div className="chat-header-left">
-            <div className="chat-header-avatar" aria-hidden="true">🤖</div>
-            <div className="chat-header-info">
-              <span className="chat-header-title">AI Portfolio Assistant</span>
-              <span className="chat-header-subtitle">
-                <span className="chat-online-dot" aria-hidden="true" />
-                Ask anything about Binod
-              </span>
+      {/* Assistant Modal / Popover */}
+      {isOpen && (
+        <div className="w-[340px] sm:w-[380px] h-[480px] max-h-[80vh] bg-[#121212] border border-[#262626] shadow-2xl flex flex-col justify-between overflow-hidden animate-fade-in text-xs">
+          {/* Header */}
+          <div className="px-4 py-3 bg-[#0a0a0a] border-b border-[#202020] flex items-center justify-between">
+            <div className="flex items-center gap-2 font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#ededed]"></span>
+              <span className="text-[#ededed] font-medium">Assistant</span>
+              <span className="text-[#525252]">· offline</span>
             </div>
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="text-[#71717a] hover:text-[#ededed] font-mono text-xs px-1"
+              aria-label="Close assistant"
+            >
+              [ESC]
+            </button>
           </div>
-          <button
-            onClick={toggleChat}
-            className="chat-close-btn"
-            aria-label="Close chat assistant"
+
+          {/* Messages Container */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {messages.map((msg, index) => (
+              <div
+                key={index}
+                className={`flex flex-col ${
+                  msg.sender === "user" ? "items-end" : "items-start"
+                }`}
+              >
+                <div
+                  className={`max-w-[88%] px-3 py-2 leading-relaxed ${
+                    msg.sender === "user"
+                      ? "bg-[#222222] text-[#ededed] border border-[#333333]"
+                      : "bg-[#181818] text-[#a1a1aa] border border-[#262626]"
+                  }`}
+                >
+                  <p className="whitespace-pre-line">{msg.text}</p>
+
+                  {/* Action Link inside response */}
+                  {msg.action && (
+                    <div className="mt-2.5 pt-2 border-t border-[#262626]">
+                      {msg.action.external ? (
+                        <a
+                          href={msg.action.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 font-mono text-[11px] text-[#ededed] hover:underline"
+                        >
+                          <span>{msg.action.label}</span>
+                          <span>↗</span>
+                        </a>
+                      ) : (
+                        <Link
+                          to={msg.action.link}
+                          onClick={() => setIsOpen(false)}
+                          className="inline-flex items-center gap-1 font-mono text-[11px] text-[#ededed] hover:underline"
+                        >
+                          <span>{msg.action.label}</span>
+                          <span>→</span>
+                        </Link>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Preset Prompts Chips */}
+          <div className="px-3 py-2 bg-[#0e0e0e] border-t border-[#1c1c1c] overflow-x-auto flex gap-1.5 scrollbar-none whitespace-nowrap">
+            {presetQuestions.map((question, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => handleSend(question)}
+                className="shrink-0 font-mono text-[10px] px-2 py-1 bg-[#161616] hover:bg-[#242424] text-[#888888] hover:text-[#ededed] border border-[#222222] transition-colors"
+              >
+                {question}
+              </button>
+            ))}
+          </div>
+
+          {/* Input Footer */}
+          <form
+            onSubmit={handleSubmit}
+            className="p-3 bg-[#0a0a0a] border-t border-[#202020] flex items-center gap-2"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="chat-close-icon">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </button>
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask about skills, work, contact..."
+              className="flex-1 bg-[#141414] border border-[#262626] text-[#ededed] placeholder:text-[#525252] px-3 py-1.5 text-xs font-sans focus:outline-none focus:border-[#525252]"
+            />
+            <button
+              type="submit"
+              className="font-mono text-xs px-3 py-1.5 bg-[#222222] hover:bg-[#2e2e2e] text-[#ededed] border border-[#333333] transition-colors"
+            >
+              Ask
+            </button>
+          </form>
         </div>
-
-        {/* Messages area */}
-        <div className="chat-messages" role="log" aria-live="polite" aria-relevant="additions">
-          {messages.map((msg) => (
-            <ChatMessage key={msg.id} message={msg} />
-          ))}
-
-          {/* Suggestion chips (shown after welcome only) */}
-          {showChips && messages.length === 1 && (
-            <SuggestionChips onSelect={handleSend} />
-          )}
-
-          {/* Typing indicator */}
-          {isTyping && <TypingIndicator />}
-
-          {/* Scroll anchor */}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input area */}
-        <div className="chat-input-area">
-          <textarea
-            ref={inputRef}
-            className="chat-input"
-            placeholder="Ask me anything about Binod..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            rows={1}
-            aria-label="Type your message"
-            aria-multiline="true"
-          />
-          <button
-            onClick={() => handleSend()}
-            disabled={!inputValue.trim() || isTyping}
-            className="chat-send-btn"
-            aria-label="Send message"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="chat-send-icon">
-              <line x1="22" y1="2" x2="11" y2="13" />
-              <polygon points="22 2 15 22 11 13 2 9 22 2" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Footer hint */}
-        <div className="chat-footer-hint">
-          <span>Enter to send · Shift+Enter for newline · ESC to close</span>
-        </div>
-      </div>
-
-      {/* ── Floating Button ───────────────────────────────────────────── */}
-      <button
-        onClick={toggleChat}
-        className={`chat-fab ${isOpen ? 'chat-fab--open' : ''}`}
-        aria-label="Open AI Portfolio Assistant"
-        title="Chat with Binod's AI Assistant"
-      >
-        {/* Pulse ring */}
-        {!isOpen && <span className="chat-fab-ring" aria-hidden="true" />}
-
-        {/* Icon: Bot when closed, X when open */}
-        <span className="chat-fab-icon" aria-hidden="true">
-          {isOpen ? (
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-6 h-6">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          ) : (
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-              <path d="M12 2a2 2 0 012 2v1h4a2 2 0 012 2v8a2 2 0 01-2 2h-1l-2 3-2-3H7a2 2 0 01-2-2V7a2 2 0 012-2h4V4a2 2 0 012-2zm0 2v1H8a4 4 0 00-4 4v8a4 4 0 004 4h3.586l1.707 2.707a1 1 0 001.414 0L16.414 19H18a4 4 0 004-4V7a4 4 0 00-4-4h-4V4h-2z" fillRule="evenodd" clipRule="evenodd"/>
-              <circle cx="9" cy="11" r="1" />
-              <circle cx="12" cy="11" r="1" />
-              <circle cx="15" cy="11" r="1" />
-            </svg>
-          )}
-        </span>
-
-        {/* Notification badge */}
-        {hasNewMessage && !isOpen && (
-          <span className="chat-fab-badge" aria-label="New message">●</span>
-        )}
-      </button>
-    </>
+      )}
+    </div>
   );
-};
-
-export default ChatAssistant;
+}

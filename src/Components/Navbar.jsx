@@ -1,105 +1,99 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { portfolioData } from "../data/portfolioData";
 
-const Navbar = () => {
+const navLinks = [
+  { name: "About", path: "/about" },
+  { name: "Work", path: "/work" },
+  { name: "Experience", path: "/experience" },
+  { name: "Contact", path: "/contact" },
+];
 
-  const [isOpen, setIsOpen] = useState(false);
+export default function Navbar() {
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div 
-      className="
-        fixed top-2 inset-x-2 z-50
-        flex justify-between items-center
-        px-6 py-3
-        text-white
-      "
-    >
-
-      {/* Logo */}
-      <a href="#home">
-        <img
-          src="https://i.pinimg.com/originals/af/09/41/af0941ba06185e9846af909ba9350baf.png"
-          alt="logo"
-          className="h-15 w-15 object-cover border border-white/15 rounded-full"
-        />
-      </a>
-
-      {/* Center Glass Navbar (Desktop) */}
-      <div className="hidden min-[700px]:flex absolute left-1/2 -translate-x-1/2">
-
-        <div
-          className="
-            flex items-center gap-10
-            px-8 py-3
-            rounded-full
-            backdrop-blur-3xl
-            border border-white/20
-            shadow-lg
-            text-lg
-            font-thin
-            bg-black/40
-          "
+    <header className="sticky top-0 z-40 w-full bg-[#0a0a0a]/90 backdrop-blur-md border-b border-[#1f1f1f]">
+      <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+        {/* Monogram Brand */}
+        <Link
+          to="/"
+          className="font-mono text-sm tracking-wider font-semibold text-[#ededed] hover:text-white transition-colors"
+          onClick={() => setMobileOpen(false)}
         >
-          <a href="#about" className="hover:text-green-400 transition">
-            About Me
-          </a>
+          {portfolioData.personal.monogram}
+          <span className="text-[#71717a] ml-1.5 text-xs font-normal">/ 01</span>
+        </Link>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center space-x-8 text-xs font-medium tracking-wide">
+          {navLinks.map((link) => (
+            <NavLink
+              key={link.path}
+              to={link.path}
+              className={({ isActive }) =>
+                `transition-colors py-1 ${
+                  isActive
+                    ? "text-[#ffffff] font-semibold border-b border-[#ededed]"
+                    : "text-[#888888] hover:text-[#ededed]"
+                }`
+              }
+            >
+              {link.name}
+            </NavLink>
+          ))}
 
           <a
-            href="/BinodBudhaResume.pdf"
-            download
-            className="hover:text-green-400 transition"
+            href={portfolioData.contact.resumeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-mono text-[#a1a1aa] hover:text-white px-3 py-1.5 border border-[#2e2e2e] hover:border-[#525252] transition-colors"
           >
-            Resume
+            Resume ↗
           </a>
+        </nav>
 
-          <a href="#connect" className="hover:text-green-400 transition">
-            Let's Connect
-          </a>
-        </div>
-      </div>
-
-      {/* Hamburger (Mobile) */}
-      <div className="relative min-[700px]:hidden">
-
-        <div
-          className="text-3xl cursor-pointer"
-          onClick={() => setIsOpen(!isOpen)}
+        {/* Mobile Toggle Button */}
+        <button
+          type="button"
+          onClick={() => setMobileOpen(!mobileOpen)}
+          className="md:hidden text-xs font-mono px-2.5 py-1.5 border border-[#2e2e2e] text-[#ededed] hover:bg-[#181818] transition-colors"
+          aria-label="Toggle navigation menu"
+          aria-expanded={mobileOpen}
         >
-          <i className="ri-menu-line"></i>
-        </div>
-
-        {isOpen && (
-          <div
-            className="
-              absolute right-0 top-full mt-4
-              flex flex-col gap-3
-              bg-black/80 backdrop-blur-3xl
-              p-6 rounded-xl
-              shadow-lg
-              font-extralight text-sm
-            "
-          >
-            <a href="#about" className="hover:text-green-400 transition">
-              About Me
-            </a>
-
-            <a
-              href="/BinodBudhaResume.pdf"
-              download
-              className="hover:text-green-400 transition"
-            >
-              Resume
-            </a>
-
-            <a href="#connect" className="hover:text-green-400 transition">
-              Let's Connect
-            </a>
-          </div>
-        )}
-
+          {mobileOpen ? "CLOSE" : "MENU"}
+        </button>
       </div>
 
-    </div>
-  )
+      {/* Mobile Drawer Menu */}
+      {mobileOpen && (
+        <div className="md:hidden border-b border-[#1f1f1f] bg-[#0d0d0d] px-6 py-4 flex flex-col space-y-3 text-sm">
+          {navLinks.map((link) => (
+            <NavLink
+              key={link.path}
+              to={link.path}
+              onClick={() => setMobileOpen(false)}
+              className={({ isActive }) =>
+                `py-1.5 transition-colors ${
+                  isActive ? "text-[#ffffff] font-medium" : "text-[#888888] hover:text-[#ededed]"
+                }`
+              }
+            >
+              {link.name}
+            </NavLink>
+          ))}
+          <a
+            href={portfolioData.contact.resumeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setMobileOpen(false)}
+            className="pt-2 text-xs font-mono text-[#a1a1aa] hover:text-white flex items-center justify-between border-t border-[#1f1f1f]"
+          >
+            <span>Download Resume</span>
+            <span>↗</span>
+          </a>
+        </div>
+      )}
+    </header>
+  );
 }
-
-export default Navbar
